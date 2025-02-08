@@ -34,9 +34,19 @@ def main():
         try:
             # Load and display data preview
             df = pd.read_csv(uploaded_file)
-            
+
             with st.expander("Data Preview", expanded=True):
                 st.dataframe(df.head(), use_container_width=True)
+
+            # Data context input
+            st.subheader("Data Context")
+            user_context = st.text_area(
+                "Provide additional context about your data (optional)",
+                help="Describe the purpose, domain, and any specific requirements for your data. "
+                "This will help generate more relevant and accurate rules.",
+                placeholder="Example: This dataset contains customer transaction records for an e-commerce platform. "
+                "Transaction dates should be within the last year, and all monetary values should be positive."
+            )
 
             # Initialize analyzers
             data_analyzer = DataAnalyzer(df)
@@ -46,7 +56,7 @@ def main():
             # Display basic stats
             col1, col2, col3 = st.columns(3)
             stats = data_analyzer.get_basic_stats()
-            
+
             with col1:
                 st.metric("Total Rows", stats["row_count"])
             with col2:
@@ -55,33 +65,34 @@ def main():
                 st.metric("Columns with Missing Values", 
                          sum(1 for v in stats["missing_values"].values() if v > 0))
 
-            # Generate rules
-            with st.spinner("Generating data quality rules..."):
-                rules = rule_generator.generate_rules()
-                formatted_rules = rule_generator.format_rules_for_display(rules)
+            # Generate rules button
+            if st.button("Generate Data Quality Rules"):
+                with st.spinner("Analyzing data and generating rules..."):
+                    # Pass user context to rule generation
+                    rules = rule_generator.generate_rules(user_context)
+                    formatted_rules = rule_generator.format_rules_for_display(rules)
 
-            # Display rules by category
-            st.header("Generated Data Quality Rules")
-            
-            for category, rule_list in formatted_rules.items():
-                with st.expander(category, expanded=True):
-                    for rule in rule_list:
-                        if isinstance(rule, dict):
-                            # Handle cross-column rules
-                            st.markdown(f"""
-                            **Rule:** {rule['rule']}  
-                            **Columns:** {', '.join(rule['columns_involved'])}  
-                            **Type:** {rule['validation_type']}
-                            """)
-                        else:
-                            # Handle simple rules
-                            st.markdown(f"• {rule}")
+                # Display rules by category
+                st.header("Generated Data Quality Rules")
 
-            # Export rules
-            if st.button("Download Rules as JSON"):
+                for category, rule_list in formatted_rules.items():
+                    with st.expander(category, expanded=True):
+                        for rule in rule_list:
+                            if isinstance(rule, dict):
+                                # Handle cross-column rules
+                                st.markdown(f"""
+                                **Rule:** {rule['rule']}  
+                                **Columns:** {', '.join(rule['columns_involved'])}  
+                                **Type:** {rule['validation_type']}
+                                """)
+                            else:
+                                # Handle simple rules
+                                st.markdown(f"• {rule}")
+
+                # Export rules
                 rules_json = rule_generator.export_rules_to_json(rules)
                 st.download_button(
-                    label="Click to download",
+                    label="Download Rules as JSON",
                     data=rules_json,
                     file_name="data_quality_rules.json",
                     mime="application/json"

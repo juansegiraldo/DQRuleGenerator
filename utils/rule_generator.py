@@ -6,31 +6,36 @@ class RuleGenerator:
         self.data_analyzer = data_analyzer
         self.openai_helper = openai_helper
 
-    def generate_rules(self):
+    def generate_rules(self, user_context=""):
         # Get data insights
         column_types = self.data_analyzer.infer_column_types()
         column_profiles = self.data_analyzer.generate_column_profiles()
         correlations = self.data_analyzer.get_column_correlations()
-        
+
         # Get AI-generated rules
         sample_data = self.data_analyzer.get_data_sample()
         column_info = {
             "types": column_types,
             "profiles": column_profiles
         }
-        
-        rules = self.openai_helper.analyze_data_sample(sample_data, column_info)
-        
+
+        rules = self.openai_helper.analyze_data_sample(
+            sample_data, 
+            column_info,
+            user_context
+        )
+
         # Get cross-column rules
         cross_column_rules = self.openai_helper.suggest_cross_column_rules(
             list(column_types.keys()),
-            correlations
+            correlations,
+            user_context
         )
-        
+
         # Combine all rules
         all_rules = rules["rules"]
         all_rules["cross_column"] = cross_column_rules["cross_column_rules"]
-        
+
         return all_rules
 
     def format_rules_for_display(self, rules):
@@ -44,10 +49,10 @@ class RuleGenerator:
             "validity": "Validity Rules",
             "cross_column": "Cross-Column Rules"
         }
-        
+
         for category, rules_list in rules.items():
             formatted_rules[categories[category]] = rules_list
-            
+
         return formatted_rules
 
     def export_rules_to_json(self, rules):
