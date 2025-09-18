@@ -1,0 +1,6 @@
+name,age,email,salary,join_date
+John Doe,25,john@example.com,50000,2023-01-15
+Jane Smith,30,jane@example.com,60000,2023-02-20
+Bob Johnson,35,bob@example.com,70000,2023-03-10
+Alice Brown,28,alice@example.com,55000,2023-04-05
+Charlie Wilson,32,charlie@example.com,65000,2023-05-12
