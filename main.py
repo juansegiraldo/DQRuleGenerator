@@ -212,7 +212,7 @@ def main():
 
             # Generate rules button
             if st.button("Generate Data Quality Rules"):
-                with st.spinner("Analyzing data and generating rules..."):
+                with st.spinner("DQ Agent working..."):
                     # Pass user context to rule generation
                     rules = rule_generator.generate_rules(user_context)
                     formatted_rules = rule_generator.format_rules_for_display(rules)
@@ -227,17 +227,12 @@ def main():
                 summary_metrics = kpi_analyzer.get_summary_metrics()
                 quality_score = kpi_analyzer.get_quality_score()
                 
-                col1, col2, col3, col4, col5 = st.columns(5)
+                col1, col2 = st.columns(2)
                 with col1:
                     st.metric("Total Rules", summary_metrics["total_rules"])
                 with col2:
-                    st.metric("SQL Coverage", summary_metrics["sql_coverage"])
-                with col3:
-                    st.metric("Quality Score", f"{quality_score}/100")
-                with col4:
                     st.metric("Top Category", summary_metrics["top_category"])
-                with col5:
-                    st.metric("Complexity Ratio", summary_metrics["complexity_ratio"])
+                
                 
                 # KPI Charts
                 col1, col2 = st.columns(2)

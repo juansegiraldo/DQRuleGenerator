@@ -230,3 +230,4 @@ class KPIAnalyzer:
         )
         
         return round(quality_score * 100, 1)
+
