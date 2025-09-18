@@ -7,7 +7,7 @@ import json
 class OpenAIHelper:
     def __init__(self):
         self.client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        self.model = "gpt-4o"
+        self.model = "gpt-4o-mini"
 
     def analyze_data_sample(self, data_sample, column_info, user_context=""):
         context_prompt = f"\nAdditional context about the data: {user_context}" if user_context else ""
